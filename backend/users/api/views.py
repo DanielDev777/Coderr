@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer
+from .permissions import IsOwnerOrReadOnly
 
 
 class RegistrationView(APIView):
@@ -53,19 +54,18 @@ class LoginView(APIView):
 
 class ProfileDetailView(RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_object(self):
         user_id = self.kwargs.get('pk')
         user = get_object_or_404(User, id=user_id)
 
-        # Check if user has business_profile
         if hasattr(user, 'business_profile'):
-            return user.business_profile
-
-        # Check if user has customer_profile
-        if hasattr(user, 'customer_profile'):
-            return user.customer_profile
-
-        # If neither exists, raise 404
-        raise Http404("Profile not found")
+            profile = user.business_profile
+        elif hasattr(user, 'customer_profile'):
+            profile = user.customer_profile
+        else:
+            raise Http404("Profile not found")
+        
+        self.check_object_permissions(self.request, profile)
+        return profile

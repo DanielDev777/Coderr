@@ -86,15 +86,15 @@ class ProfileSerializer(serializers.Serializer):
     """Serializer for BusinessProfile and CustomerProfile"""
     user = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
-    email = serializers.EmailField(source='user.email', read_only=True)
-    first_name = serializers.CharField(source='user.first_name', read_only=True)
-    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    email = serializers.EmailField(source='user.email', required=False)
+    first_name = serializers.CharField(source='user.first_name', required=False, allow_blank=True)
+    last_name = serializers.CharField(source='user.last_name', required=False, allow_blank=True)
     
-    location = serializers.CharField(read_only=True)
-    tel = serializers.CharField(read_only=True)
-    description = serializers.CharField(read_only=True)
-    working_hours = serializers.CharField(read_only=True)
-    file = serializers.ImageField(read_only=True)
+    location = serializers.CharField(required=False, allow_blank=True)
+    tel = serializers.CharField(required=False, allow_blank=True)
+    description = serializers.CharField(required=False, allow_blank=True)
+    working_hours = serializers.CharField(required=False, allow_blank=True)
+    file = serializers.ImageField(required=False, allow_null=True)
     created_at = serializers.DateTimeField(read_only=True)
     
     type = serializers.SerializerMethodField()
@@ -103,11 +103,26 @@ class ProfileSerializer(serializers.Serializer):
         """Determine if this is a business or customer profile"""
         return 'business' if isinstance(obj, BusinessProfile) else 'customer'
 
+    def update(self, instance, validated_data):
+        """Update both User and Profile fields"""
+        user_data = validated_data.pop('user', {})
+        
+        if user_data:
+            for key, value in user_data.items():
+                setattr(instance.user, key, value)
+            instance.user.save()
+        
+        if validated_data:
+            for key, value in validated_data.items():
+                setattr(instance, key, value)
+            instance.save()
+        
+        return instance
+
     def to_representation(self, instance):
         """Convert None to empty string for text fields"""
         data = super().to_representation(instance)
         
-        # Convert None to '' for these fields
         data['first_name'] = data.get('first_name') or ''
         data['last_name'] = data.get('last_name') or ''
         data['location'] = data.get('location') or ''
