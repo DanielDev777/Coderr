@@ -18,7 +18,6 @@ class RegistrationView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """Handle user registration"""
         serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -35,10 +34,10 @@ class RegistrationView(APIView):
 
 
 class LoginView(APIView):
+    """API endpoint for user login and token generation."""
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """Login user and return authentication token."""
         serializer = LoginSerializer(data=request.data)
 
         if serializer.is_valid():

@@ -84,14 +84,12 @@ class LoginSerializer(serializers.Serializer):
 
 class ProfileSerializer(serializers.Serializer):
     """Serializer for BusinessProfile and CustomerProfile"""
-    # User fields (accessed via profile.user)
     user = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
     email = serializers.EmailField(source='user.email', read_only=True)
     first_name = serializers.CharField(source='user.first_name', read_only=True)
     last_name = serializers.CharField(source='user.last_name', read_only=True)
     
-    # Profile fields (directly on the profile)
     location = serializers.CharField(read_only=True)
     tel = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
@@ -99,7 +97,6 @@ class ProfileSerializer(serializers.Serializer):
     file = serializers.ImageField(read_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     
-    # Type field (business or customer)
     type = serializers.SerializerMethodField()
     
     def get_type(self, obj):

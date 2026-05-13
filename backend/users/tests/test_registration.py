@@ -21,11 +21,8 @@ class RegistrationTests(APITestCase):
         self.assertEqual(response.data['email'], 'biz@test.com')
         self.assertEqual(response.data['type'], 'business')
         
-        # Verify user was created
         user = User.objects.get(username='bizuser')
         self.assertEqual(user.email, 'biz@test.com')
-        
-        # Verify BusinessProfile was created
         self.assertTrue(BusinessProfile.objects.filter(user=user).exists())
     
     def test_register_customer_user(self):
@@ -42,18 +39,13 @@ class RegistrationTests(APITestCase):
         self.assertIn('token', response.data)
         self.assertEqual(response.data['type'], 'customer')
         
-        # Verify user was created
         user = User.objects.get(username='custuser')
-        
-        # Verify CustomerProfile was created
         self.assertTrue(CustomerProfile.objects.filter(user=user).exists())
     
     def test_register_duplicate_username(self):
         """Test registration with existing username returns 400"""
-        # Create first user
         User.objects.create_user(username='existing', password='pass123')
         
-        # Try to register with same username
         data = {
             'username': 'existing',
             'email': 'new@test.com',
