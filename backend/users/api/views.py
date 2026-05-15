@@ -2,13 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
 from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer
 from .permissions import IsOwnerOrReadOnly
+from users.models import BusinessProfile
 
 
 class RegistrationView(APIView):
@@ -69,3 +70,8 @@ class ProfileDetailView(RetrieveUpdateAPIView):
         
         self.check_object_permissions(self.request, profile)
         return profile
+
+class BusinessProfileView(ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = BusinessProfile.objects.all()
