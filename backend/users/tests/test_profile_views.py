@@ -221,7 +221,7 @@ class ProfileViewTests(APITestCase):
         response = self.client.patch(
             f'/api/profile/{self.business_user.id}/',
             update_data,
-            format='multipart'  # Required for file uploads
+            format='multipart'
         )
         
         self.assertEqual(response.status_code, 200)

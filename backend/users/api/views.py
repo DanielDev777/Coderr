@@ -9,7 +9,7 @@ from django.http import Http404
 
 from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer
 from .permissions import IsOwnerOrReadOnly
-from users.models import BusinessProfile
+from users.models import BusinessProfile, CustomerProfile
 
 
 class RegistrationView(APIView):
@@ -71,7 +71,12 @@ class ProfileDetailView(RetrieveUpdateAPIView):
         self.check_object_permissions(self.request, profile)
         return profile
 
-class BusinessProfileView(ListAPIView):
+class BusinessProfileListView(ListAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
     queryset = BusinessProfile.objects.all()
+
+class CustomerProfileListView(ListAPIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = CustomerProfile.objects.all()

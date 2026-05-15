@@ -75,8 +75,8 @@ class ProfileListsTests(APITestCase):
         for profile in results:
             self.assertEqual(profile['type'], 'business')
 
-    def test_empty_fields_return_empty_string_not_null(self):
-        """Test that empty profile fields return '' instead of null"""
+    def test_empty_business_fields_return_empty_string_not_null(self):
+        """Test that empty business profile fields return '' instead of null"""
         empty_user = User.objects.create_user(username='emptyuser', password='pass')
         BusinessProfile.objects.create(user=empty_user)
         
@@ -125,3 +125,87 @@ class ProfileListsTests(APITestCase):
         self.assertIn('business0', usernames)
         self.assertIn('business1', usernames)
         self.assertIn('business2', usernames)
+
+    def test_authenticated_user_can_access_customer_profile(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+
+        response = self.client.get(f'/api/profiles/customer/')
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_unauthenticated_user_can_not_access_customer_profile(self):
+        response = self.client.get(f'/api/profiles/customer/')
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_only_customer_profiles_returned_not_business(self):
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+
+        biz_user = User.objects.create_user(username='biz')
+        BusinessProfile.objects.create(user=biz_user)
+
+        cust_user = User.objects.create_user(username='cust')
+        CustomerProfile.objects.create(user=cust_user)
+
+        response = self.client.get('/api/profiles/customer/')
+
+        results = response.data['results']
+        self.assertEqual(len(results), 2)
+        
+        usernames = [profile['username'] for profile in results]
+        self.assertIn('cust', usernames)
+        self.assertIn('custuser', usernames)
+        
+        for profile in results:
+            self.assertEqual(profile['type'], 'customer')
+
+    def test_empty_customer_fields_return_empty_string_not_null(self):
+        """Test that empty customer profile fields return '' instead of null"""
+        empty_user = User.objects.create_user(username='emptycust', password='pass')
+        CustomerProfile.objects.create(user=empty_user)
+        
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get(f'/api/profiles/customer/')
+
+        empty_profile = None
+        for profile in response.data['results']:
+            if profile['username'] == 'emptycust':
+                empty_profile = profile
+                break
+        
+        self.assertIsNotNone(empty_profile)
+        
+        self.assertEqual(empty_profile['first_name'], '')
+        self.assertEqual(empty_profile['last_name'], '')
+        self.assertEqual(empty_profile['location'], '')
+        self.assertEqual(empty_profile['tel'], '')
+        self.assertEqual(empty_profile['description'], '')
+        self.assertEqual(empty_profile['working_hours'], '')
+
+    def test_list_returns_multiple_customer_users(self):
+        """Test that all customer users are returned in the list"""
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        
+        for i in range(3):
+            user = User.objects.create_user(
+                username=f'customer{i}',
+                first_name=f'Customer{i}',
+                last_name=f'User{i}'
+            )
+            CustomerProfile.objects.create(
+                user=user,
+                location=f'City{i}',
+                description=f'Description {i}'
+            )
+        
+        response = self.client.get('/api/profiles/customer/')
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 4)
+        
+        results = response.data['results']
+        usernames = [profile['username'] for profile in results]
+        self.assertIn('custuser', usernames)
+        self.assertIn('customer0', usernames)
+        self.assertIn('customer1', usernames)
+        self.assertIn('customer2', usernames)
