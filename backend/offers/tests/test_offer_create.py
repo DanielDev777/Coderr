@@ -94,11 +94,11 @@ class OfferCreateTests(APITestCase):
 
     def test_less_than_three_details_returns_400(self):
         """Test that offers must have exactly 3 details"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.customer_token.key}')
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
         data = self.get_valid_offer_data()
         data['details'] = data['details'][:2]
 
-        response = self.client.post('/api/offers', data, format='json')
+        response = self.client.post('/api/offers/', data, format='json')
 
         self.assertEqual(response.status_code, 400)
         self.assertIn('details', response.data)
@@ -111,7 +111,7 @@ class OfferCreateTests(APITestCase):
         data = self.get_valid_offer_data()
         data['details'].append({
             'title': 'Extra',
-            'revisision': 10,
+            'revisions': 10,
             'delivery_time_in_days': 1,
             'price': 500,
             'features': ['Everything'],
@@ -128,12 +128,12 @@ class OfferCreateTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
 
         data = self.get_valid_offer_data()
-        data['details'][1]['offer_type'] ='basic'
+        data['details'][1]['offer_type'] = 'basic'
 
         response = self.client.post('/api/offers/', data, format='json')
 
         self.assertEqual(response.status_code, 400)
-        self. assertIn('details', response.data)
+        self.assertIn('details', response.data)
         self.assertEqual(Offer.objects.count(), 0)
 
     def test_missing_title_returns_400(self):
