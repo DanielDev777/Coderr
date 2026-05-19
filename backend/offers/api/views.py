@@ -1,7 +1,6 @@
-from rest_framework import status, filters
+from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView, ListCreateAPIView
-from rest_framework.response import Response
+from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Min
 
@@ -43,3 +42,15 @@ class OfferListView(ListCreateAPIView):
         )
 
         return queryset
+
+class OfferDetailView(RetrieveAPIView):
+    """API endpoint for retrieving a single offer."""
+    serializer_class = OfferListSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Offer.objects.select_related('user').prefetch_related('details').annotate(
+            min_price=Min('details__price'),
+            min_delivery_time=Min('detail__delivery_time_in_days')
+        )
+    
