@@ -8,3 +8,8 @@ class IsBusinessUser(BasePermission):
             return False
         
         return hasattr(request.user, 'business_profile')
+    
+class IsOfferOwner(BasePermission):
+    """Only offer creator can modify offer"""
+    def has_object_permission(self, request, view, obj):
+        return obj.user == request.user
