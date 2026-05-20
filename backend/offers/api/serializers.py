@@ -1,14 +1,15 @@
 from rest_framework import serializers
 from offers.models import Offer, OfferDetail
 
+
 class OfferDetailListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField()
-    
+
     def get_url(self, obj):
         return f'/api/offerdetails/{obj.id}/'
-    
-    
+
+
 class OfferListSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     user = serializers.IntegerField(source='user.id', read_only=True)
@@ -24,17 +25,18 @@ class OfferListSerializer(serializers.Serializer):
 
     def get_min_price(self, obj):
         return obj.min_price
-    
+
     def get_min_delivery_time(self, obj):
         return obj.min_delivery_time
-    
+
     def get_user_details(self, obj):
         return {
             'first_name': obj.user.first_name,
             'last_name': obj.user.last_name,
             'username': obj.user.username
         }
-    
+
+
 class OfferDetailSerializer(serializers.ModelSerializer):
     """Serializer for individual OfferDetail instances"""
     class Meta:
@@ -48,6 +50,10 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             'features',
             'offer_type'
         ]
+        extra_kwargs = {
+            'id': {'read_only': False},
+        }
+
 
 class OfferCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating offers with nested details."""
@@ -63,14 +69,14 @@ class OfferCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 "An offer must have exactly 3 details (basic, standard, premium)"
             )
-        
+
         offer_types = [detail['offer_type'] for detail in value]
-        
+
         if len(offer_types) != len(set(offer_types)):
             raise serializers.ValidationError(
                 "Each detail must have a unique offer_type. Found duplicates."
             )
-        
+
         required_types = {'basic', 'standard', 'premium'}
         provided_types = set(offer_types)
 
@@ -79,9 +85,9 @@ class OfferCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(
                 f"Missing offer_types: {missing}. Must include basic, standard, and premium."
             )
-        
+
         return value
-    
+
     def create(self, validated_data):
         details_data = validated_data.pop('details')
         offer = Offer.objects.create(**validated_data)
@@ -90,3 +96,38 @@ class OfferCreateSerializer(serializers.ModelSerializer):
             OfferDetail.objects.create(offer=offer, **detail_data)
 
         return offer
+
+
+class OfferUpdateSerializer(serializers.ModelSerializer):
+    details = OfferDetailSerializer(many=True, required=False)
+
+    class Meta:
+        model = Offer
+        fields = ['id', 'title', 'image', 'description', 'details']
+        read_only_fields = ['id']
+
+    def update(self, instance, validated_data):
+        details_data = validated_data.pop('details', None)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        if details_data is not None:
+            for detail_data in details_data:
+                detail_id = detail_data.get('id')
+
+                if detail_id:
+                    try:
+                        detail = OfferDetail.objects.get(
+                            id=detail_id,
+                            offer=instance
+                        )
+                        for attr, value in detail_data.items():
+                            if attr != 'id':
+                                setattr(detail, attr, value)
+                        detail.save()
+                    except OfferDetail.DoesNotExist:
+                        pass
+
+        return instance

@@ -5,6 +5,8 @@ from users.models import BusinessProfile
 from offers.models import Offer, OfferDetail
 from decimal import Decimal
 from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+import io
 
 
 class OfferUpdateTests(APITestCase):
@@ -141,12 +143,19 @@ class OfferUpdateTests(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_owner_upload_image(self):
-        image = SimpleUploadedFile(
-            "test_image.jpg",
-            b"file_content",
-            content_type="image/jpeg"
+        # Create a simple 1x1 pixel red PNG image
+        image = Image.new('RGB', (1, 1), color='red')
+        image_io = io.BytesIO()
+        image.save(image_io, format='PNG')
+        image_io.seek(0)
+        
+        image_file = SimpleUploadedFile(
+            "test_image.png",
+            image_io.read(),
+            content_type="image/png"
         )
-        data = {'image': image}
+        
+        data = {'image': image_file}
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.owner_token.key}')
         
         response = self.client.patch(
