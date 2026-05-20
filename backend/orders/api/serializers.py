@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from orders.models import Order
+from offers.models import OfferDetail
 
 class OrderSerializer(serializers.ModelSerializer):
-    """Serializer for Order model"""
+    """Serializer for Order model (read-only for list)"""
 
     class Meta:
         model = Order
@@ -13,3 +14,39 @@ class OrderSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
         read_only_fields = fields
+
+class OrderCreateSerializer(serializers.Serializer):
+    """Serializer for creating orders from OfferDetail."""
+    offer_detail_id = serializers.IntegerField()
+
+    def validate_offer_detail_id(self, value):
+        try:
+            OfferDetail.objects.get(id=value)
+        except OfferDetail.DoesNotExist:
+            raise serializers.ValidationError("OfferDetail not found")
+        return value
+    
+    def create(self, validated_data):
+        detail = OfferDetail.objects.get(id=validated_data['offer_detail_id'])
+
+        customer_user = self.context['request'].user
+        business_user = detail.offer.user
+
+        order = Order.objects.create(
+            customer_user=customer_user,
+            business_user=business_user,
+            offer_detail=detail,
+            
+            title=detail.title,
+            revisions=detail.revisions,
+            delivery_time_in_days=detail.delivery_time_in_days,
+            price=detail.price,
+            features=detail.features,
+            offer_type=detail.offer_type,
+            status='in_progress'
+        )
+
+        return order
+    
+    def to_representation(self, instance):
+        return OrderSerializer(instance).data
