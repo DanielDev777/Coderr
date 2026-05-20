@@ -6,8 +6,8 @@ from django.db.models import Min
 
 from offers.filters import OfferFilter
 from offers.permissions import IsBusinessUser, IsOfferOwner
-from offers.models import Offer
-from .serializers import OfferListSerializer, OfferCreateSerializer, OfferUpdateSerializer
+from offers.models import Offer, OfferDetail
+from .serializers import OfferDetailSerializer, OfferListSerializer, OfferCreateSerializer, OfferUpdateSerializer
 
 
 class OfferListView(ListCreateAPIView):
@@ -63,3 +63,9 @@ class OfferDetailView(RetrieveUpdateDestroyAPIView):
         if self.request.method in ['PATCH', 'DELETE']:
             return [IsAuthenticated(), IsOfferOwner()]
         return [IsAuthenticated()]
+    
+class OfferTierDetailView(RetrieveAPIView):
+    """API endpoint for retrieving a single offer pricing tier."""
+    queryset = OfferDetail.objects.all()
+    serializer_class = OfferDetailSerializer
+    permission_classes = [IsAuthenticated]
