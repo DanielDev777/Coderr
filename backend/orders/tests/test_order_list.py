@@ -113,9 +113,9 @@ class OrderListTests(APITestCase):
         response = self.client.get('/api/orders/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2) 
+        self.assertEqual(len(response.data['results']), 2) 
 
-        order_ids = [order['id'] for order in response.data]
+        order_ids = [order['id'] for order in response.data['results']]
         self.assertIn(self.order1.id, order_ids)
         self.assertIn(self.order2.id, order_ids)
         self.assertNotIn(self.order3.id, order_ids)
@@ -127,9 +127,9 @@ class OrderListTests(APITestCase):
         response = self.client.get('/api/orders/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
+        self.assertEqual(len(response.data['results']), 2)
         
-        order_ids = [order['id'] for order in response.data]
+        order_ids = [order['id'] for order in response.data['results']]
         self.assertIn(self.order1.id, order_ids)
         self.assertIn(self.order3.id, order_ids)
         self.assertNotIn(self.order2.id, order_ids)
@@ -154,8 +154,8 @@ class OrderListTests(APITestCase):
         response = self.client.get('/api/orders/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 3)
-        
+        self.assertEqual(len(response.data['results']), 3)
+
     def test_unauthenticated_user_cannot_list_orders(self):
         """User without token should get 401"""
         
@@ -168,9 +168,8 @@ class OrderListTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.cust1_token.key}')
         
         response = self.client.get('/api/orders/')
-        
         self.assertEqual(response.status_code, 200)
-        order = response.data[0]
+        order = response.data['results'][0]
         
         self.assertIn('id', order)
         self.assertIn('customer_user', order)
