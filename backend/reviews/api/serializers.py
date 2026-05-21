@@ -49,12 +49,22 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         return value
     
     def validate(self, data):
-        """Validate user is not reviewing themselves"""
+        """Validate user is not reviewing themselves and no duplicate exists"""
         request = self.context.get('request')
+        
         if data['business_user'] == request.user:
             raise serializers.ValidationError({
                 'business_user': "You cannot review yourself."
             })
+        
+        if Review.objects.filter(
+            reviewer=request.user,
+            business_user=data['business_user']
+        ).exists():
+            raise serializers.ValidationError(
+                "You have already reviewed this business user."
+            )
+        
         return data
     
     def create(self, validated_data):
