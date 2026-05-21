@@ -1,11 +1,15 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 
 from reviews.models import Review
-from reviews.api.serializers import ReviewSerializer, ReviewCreateSerializer
-from reviews.permissions import IsCustomerUser
+from reviews.api.serializers import (
+    ReviewSerializer,
+    ReviewCreateSerializer,
+    ReviewUpdateSerializer
+)
+from reviews.permissions import IsCustomerUser, IsReviewOwner
 
 class ReviewListView(ListCreateAPIView):
     """API endpoint for listing and creating reviews."""
@@ -27,4 +31,23 @@ class ReviewListView(ListCreateAPIView):
         """Different permissions for different actions"""
         if self.request.method == 'POST':
             return [IsAuthenticated(), IsCustomerUser()]
+        return [IsAuthenticated()]
+
+class ReviewDetailView(RetrieveUpdateDestroyAPIView):
+    """API endpoint for retrieving, updating, and deleting specific review."""
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    
+    def get_serializer_class(self):
+        """Use update serializer for PATCH"""
+        if self.request.method == 'PATCH':
+            return ReviewUpdateSerializer
+        return ReviewSerializer
+    
+    def get_permissions(self):
+        """Different permissions for different actions"""
+        if self.request.method == 'PATCH':
+            return [IsAuthenticated(), IsReviewOwner()]
+        elif self.request.method == 'DELETE':
+            return [IsAdminUser()]
         return [IsAuthenticated()]
