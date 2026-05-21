@@ -10,13 +10,6 @@ class ReviewDeleteTests(APITestCase):
     
     def setUp(self):
         """Create test users and review"""
-        self.admin_user = User.objects.create_user(
-            username='admin',
-            password='admin123',
-            is_staff=True
-        )
-        self.admin_token = Token.objects.create(user=self.admin_user)
-        
         self.business_user = User.objects.create_user(
             username='business1',
             password='pass123'
@@ -37,9 +30,9 @@ class ReviewDeleteTests(APITestCase):
             description='Great work!'
         )
     
-    def test_admin_can_delete_review(self):
-        """Admin user should be able to delete any review"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.admin_token.key}')
+    def test_reviewer_can_delete_own_review(self):
+        """Reviewer should be able to delete their own review"""
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.customer_token.key}')
         review_id = self.review.id
         
         response = self.client.delete(f'/api/reviews/{review_id}/')
@@ -48,9 +41,16 @@ class ReviewDeleteTests(APITestCase):
         self.assertEqual(Review.objects.count(), 0)
         self.assertFalse(Review.objects.filter(id=review_id).exists())
     
-    def test_reviewer_cannot_delete_review(self):
-        """Reviewer should not be able to delete their own review"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.customer_token.key}')
+    def test_other_customer_cannot_delete_review(self):
+        """Different customer should not be able to delete review"""
+        other_customer = User.objects.create_user(
+            username='customer2',
+            password='pass789'
+        )
+        CustomerProfile.objects.create(user=other_customer)
+        other_token = Token.objects.create(user=other_customer)
+        
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {other_token.key}')
         review_id = self.review.id
         
         response = self.client.delete(f'/api/reviews/{review_id}/')

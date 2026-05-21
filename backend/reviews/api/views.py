@@ -24,7 +24,7 @@ class ReviewListView(ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ['business_user_id', 'reviewer_id']
-    ordering_fields = ['created_at', 'updated_at', 'rating']
+    ordering_fields = ['updated_at', 'rating']
     ordering = ['-updated_at']
 
     def get_serializer_class(self):
@@ -55,7 +55,7 @@ class ReviewDetailView(RetrieveUpdateDestroyAPIView):
         if self.request.method == 'PATCH':
             return [IsAuthenticated(), IsReviewOwner()]
         elif self.request.method == 'DELETE':
-            return [IsAdminUser()]
+            return [IsAuthenticated(), IsReviewOwner()]
         return [IsAuthenticated()]
     
 class BaseInfoView(APIView):
