@@ -15,6 +15,7 @@ from orders.api.serializers import (
 )
 from orders.permissions import IsCustomerUser, IsOrderBusinessUser
 
+
 class OrderListView(ListCreateAPIView):
     """API endpoint for listing and creating orders."""
     permission_classes = [IsAuthenticated]
@@ -23,7 +24,7 @@ class OrderListView(ListCreateAPIView):
         if self.request.method == 'POST':
             return OrderCreateSerializer
         return OrderSerializer
-    
+
     def get_permissions(self):
         if self.request.method == 'POST':
             return [IsAuthenticated(), IsCustomerUser()]
@@ -35,7 +36,8 @@ class OrderListView(ListCreateAPIView):
         return Order.objects.filter(
             Q(customer_user=user) | Q(business_user=user)
         ).select_related('customer_user', 'business_user', 'offer_detail')
-    
+
+
 class OrderDetailView(RetrieveUpdateDestroyAPIView):
     """API endpoint for retrieving, updating, and deleting specific order."""
 
@@ -58,11 +60,12 @@ class OrderDetailView(RetrieveUpdateDestroyAPIView):
 
         if user.is_staff:
             return Order.objects.all()
-        
+
         return Order.objects.filter(
             Q(customer_user=user) | Q(business_user=user)
         )
-    
+
+
 class OrderCountView(APIView):
     """API endpoint for counting in_progress orders for a business user."""
 
@@ -77,3 +80,22 @@ class OrderCountView(APIView):
         ).count()
 
         return Response({'order_count': count}, status=status.HTTP_200_OK)
+
+
+class CompletedOrderCountView(APIView):
+    """API endpoint for counting completed orders for a business user."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, business_user_id):
+        business_user = get_object_or_404(User, id=business_user_id)
+
+        count = Order.objects.filter(
+            business_user=business_user,
+            status='completed'
+        ).count()
+        
+        return Response(
+            {'completed_order_count': count},
+            status=status.HTTP_200_OK
+        )
