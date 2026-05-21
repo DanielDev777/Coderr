@@ -2,7 +2,13 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from django.db.models import Avg
 
+from users.models import BusinessProfile
+from offers.models import Offer
 from reviews.models import Review
 from reviews.api.serializers import (
     ReviewSerializer,
@@ -51,3 +57,24 @@ class ReviewDetailView(RetrieveUpdateDestroyAPIView):
         elif self.request.method == 'DELETE':
             return [IsAdminUser()]
         return [IsAuthenticated()]
+    
+class BaseInfoView(APIView):
+    """API endpoint for platform-wide statistics."""
+    permission_classes = []
+    
+    def get(self, request):
+        """Return platform-wide statistics"""
+        review_count = Review.objects.count()
+        
+        avg_rating = Review.objects.aggregate(Avg('rating'))['rating__avg'] or 0.0
+        
+        business_profile_count = BusinessProfile.objects.count()
+        
+        offer_count = Offer.objects.count()
+        
+        return Response({
+            'review_count': review_count,
+            'average_rating': round(avg_rating, 1),
+            'business_profile_count': business_profile_count,
+            'offer_count': offer_count
+        }, status=status.HTTP_200_OK)
