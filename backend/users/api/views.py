@@ -60,10 +60,12 @@ class LoginView(APIView):
         )
 
 class ProfileDetailView(RetrieveUpdateAPIView):
+    """API endpoint for retrieving and updating user profiles."""
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get_object(self):
+        """Get profile (business or customer) for the user."""
         user_id = self.kwargs.get('pk')
         user = get_object_or_404(User, id=user_id)
 
@@ -78,11 +80,13 @@ class ProfileDetailView(RetrieveUpdateAPIView):
         return profile
 
 class BusinessProfileListView(ListAPIView):
+    """API endpoint for listing business profiles."""
     serializer_class = BusinessProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = BusinessProfile.objects.all()
 
 class CustomerProfileListView(ListAPIView):
+    """API endpoint for listing customer profiles."""
     serializer_class = CustomerProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = CustomerProfile.objects.all()

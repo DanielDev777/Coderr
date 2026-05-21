@@ -20,6 +20,7 @@ class OrderCreateSerializer(serializers.Serializer):
     offer_detail_id = serializers.IntegerField()
 
     def validate_offer_detail_id(self, value):
+        """Validate that the offer detail exists."""
         try:
             OfferDetail.objects.get(id=value)
         except OfferDetail.DoesNotExist:
@@ -27,6 +28,7 @@ class OrderCreateSerializer(serializers.Serializer):
         return value
     
     def create(self, validated_data):
+        """Create order from offer detail with auto-populated fields."""
         detail = OfferDetail.objects.get(id=validated_data['offer_detail_id'])
 
         customer_user = self.context['request'].user
@@ -49,6 +51,7 @@ class OrderCreateSerializer(serializers.Serializer):
         return order
     
     def to_representation(self, instance):
+        """Return full order representation after creation."""
         return OrderSerializer(instance).data
     
 class OrderUpdateSerializer(serializers.ModelSerializer):
@@ -59,4 +62,5 @@ class OrderUpdateSerializer(serializers.ModelSerializer):
         fields = ['status']
 
     def to_representation(self, instance):
+        """Return full order representation after update."""
         return OrderSerializer(instance).data

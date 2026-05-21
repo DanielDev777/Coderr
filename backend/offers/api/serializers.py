@@ -3,14 +3,17 @@ from offers.models import Offer, OfferDetail
 
 
 class OfferDetailListSerializer(serializers.Serializer):
+    """Serializer for offer detail list with id and URL."""
     id = serializers.IntegerField(read_only=True)
     url = serializers.SerializerMethodField()
 
     def get_url(self, obj):
+        """Generate API URL for the offer detail."""
         return f'/api/offerdetails/{obj.id}/'
 
 
 class OfferListSerializer(serializers.Serializer):
+    """Serializer for listing offers with computed fields."""
     id = serializers.IntegerField(read_only=True)
     user = serializers.IntegerField(source='user.id', read_only=True)
     title = serializers.CharField()
@@ -24,12 +27,15 @@ class OfferListSerializer(serializers.Serializer):
     details = OfferDetailListSerializer(many=True, read_only=True)
 
     def get_min_price(self, obj):
+        """Return minimum price from annotated queryset."""
         return obj.min_price
 
     def get_min_delivery_time(self, obj):
+        """Return minimum delivery time from annotated queryset."""
         return obj.min_delivery_time
 
     def get_user_details(self, obj):
+        """Return user details for the offer creator."""
         return {
             'first_name': obj.user.first_name,
             'last_name': obj.user.last_name,
@@ -63,6 +69,7 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def validate_details(self, value):
+        """Validate that exactly 3 details are provided with unique types."""
         if len(value) != 3:
             raise serializers.ValidationError(
                 "An offer must have exactly 3 details (basic, standard, premium)"
@@ -87,6 +94,7 @@ class OfferCreateSerializer(serializers.ModelSerializer):
         return value
 
     def create(self, validated_data):
+        """Create offer with nested details."""
         details_data = validated_data.pop('details')
         offer = Offer.objects.create(**validated_data)
 
@@ -97,6 +105,7 @@ class OfferCreateSerializer(serializers.ModelSerializer):
 
 
 class OfferUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating offers with nested details by offer_type."""
     details = OfferDetailSerializer(many=True, required=False)
 
     class Meta:
@@ -105,6 +114,7 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
         read_only_fields = ['id']
 
     def update(self, instance, validated_data):
+        """Update offer and its details by offer_type."""
         details_data = validated_data.pop('details', None)
 
         for attr, value in validated_data.items():

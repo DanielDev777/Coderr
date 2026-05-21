@@ -72,6 +72,7 @@ class OrderCountView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
+        """Return count of in-progress orders for the business user."""
         business_user = get_object_or_404(User, id=business_user_id)
 
         count = Order.objects.filter(
@@ -88,6 +89,7 @@ class CompletedOrderCountView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, business_user_id):
+        """Return count of completed orders for the business user."""
         business_user = get_object_or_404(User, id=business_user_id)
 
         count = Order.objects.filter(

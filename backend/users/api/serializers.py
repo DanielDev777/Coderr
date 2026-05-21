@@ -27,6 +27,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        """Validate that passwords match."""
         if data['password'] != data['repeated_password']:
             raise serializers.ValidationError({
                 'repeated_password': "Passwords do not match."
@@ -66,10 +67,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
         }
 
 class LoginSerializer(serializers.Serializer):
+    """Serializer for user login and authentication."""
     username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
+        """Authenticate user and return token with user data."""
         username = attrs.get('username')
         password = attrs.get('password')
 
