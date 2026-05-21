@@ -45,7 +45,6 @@ class OfferListView(ListCreateAPIView):
 
 class OfferDetailView(RetrieveUpdateDestroyAPIView):
     """API endpoint for retrieving, updating, and deleting a single offer."""
-    serializer_class = OfferListSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
