@@ -98,6 +98,18 @@ class ProfileListsTests(APITestCase):
         self.assertEqual(empty_profile['description'], '')
         self.assertEqual(empty_profile['working_hours'], '')
 
+    def test_business_list_does_not_include_email_or_date(self):
+        """Test that business list doesn't include email or created_at fields"""
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get('/api/profiles/business/')
+        
+        self.assertEqual(response.status_code, 200)
+        
+        for profile in response.data['results']:
+            self.assertNotIn('email', profile)
+            self.assertNotIn('created_at', profile)
+            self.assertNotIn('uploaded_at', profile)
+
     def test_list_returns_multiple_business_users(self):
         """Test that all business users are returned in the list"""
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
@@ -177,10 +189,31 @@ class ProfileListsTests(APITestCase):
         
         self.assertEqual(empty_profile['first_name'], '')
         self.assertEqual(empty_profile['last_name'], '')
-        self.assertEqual(empty_profile['location'], '')
-        self.assertEqual(empty_profile['tel'], '')
-        self.assertEqual(empty_profile['description'], '')
-        self.assertEqual(empty_profile['working_hours'], '')
+
+    def test_customer_list_has_uploaded_at_not_created_at(self):
+        """Test that customer list uses uploaded_at instead of created_at"""
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get('/api/profiles/customer/')
+        
+        self.assertEqual(response.status_code, 200)
+        
+        for profile in response.data['results']:
+            self.assertIn('uploaded_at', profile)
+            self.assertNotIn('created_at', profile)
+
+    def test_customer_list_does_not_include_location_tel_description_working_hours(self):
+        """Test that customer list doesn't include business-specific fields"""
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.token.key}')
+        response = self.client.get('/api/profiles/customer/')
+        
+        self.assertEqual(response.status_code, 200)
+        
+        for profile in response.data['results']:
+            self.assertNotIn('location', profile)
+            self.assertNotIn('tel', profile)
+            self.assertNotIn('description', profile)
+            self.assertNotIn('working_hours', profile)
+            self.assertNotIn('email', profile)
 
     def test_list_returns_multiple_customer_users(self):
         """Test that all customer users are returned in the list"""

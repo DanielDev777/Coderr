@@ -139,3 +139,56 @@ class ProfileSerializer(serializers.Serializer):
         data['working_hours'] = data.get('working_hours') or ''
         
         return data
+
+
+class BusinessProfileListSerializer(serializers.Serializer):
+    """Serializer for business profile list - NO email, NO date fields"""
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    file = serializers.ImageField(read_only=True)
+    location = serializers.CharField(read_only=True)
+    tel = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    working_hours = serializers.CharField(read_only=True)
+    type = serializers.SerializerMethodField()
+    
+    def get_type(self, obj):
+        return 'business'
+    
+    def to_representation(self, instance):
+        """Convert None to empty string for text fields"""
+        data = super().to_representation(instance)
+        
+        data['first_name'] = data.get('first_name') or ''
+        data['last_name'] = data.get('last_name') or ''
+        data['location'] = data.get('location') or ''
+        data['tel'] = data.get('tel') or ''
+        data['description'] = data.get('description') or ''
+        data['working_hours'] = data.get('working_hours') or ''
+        
+        return data
+
+
+class CustomerProfileListSerializer(serializers.Serializer):
+    """Serializer for customer profile list - minimal fields with uploaded_at"""
+    user = serializers.IntegerField(source='user.id', read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    file = serializers.ImageField(read_only=True)
+    uploaded_at = serializers.DateTimeField(source='created_at', read_only=True)
+    type = serializers.SerializerMethodField()
+    
+    def get_type(self, obj):
+        return 'customer'
+    
+    def to_representation(self, instance):
+        """Convert None to empty string for text fields"""
+        data = super().to_representation(instance)
+        
+        data['first_name'] = data.get('first_name') or ''
+        data['last_name'] = data.get('last_name') or ''
+        
+        return data

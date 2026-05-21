@@ -7,7 +7,13 @@ from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 
-from .serializers import RegistrationSerializer, LoginSerializer, ProfileSerializer
+from .serializers import (
+    RegistrationSerializer, 
+    LoginSerializer, 
+    ProfileSerializer,
+    BusinessProfileListSerializer,
+    CustomerProfileListSerializer
+)
 from .permissions import IsOwnerOrReadOnly
 from users.models import BusinessProfile, CustomerProfile
 
@@ -72,11 +78,11 @@ class ProfileDetailView(RetrieveUpdateAPIView):
         return profile
 
 class BusinessProfileListView(ListAPIView):
-    serializer_class = ProfileSerializer
+    serializer_class = BusinessProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = BusinessProfile.objects.all()
 
 class CustomerProfileListView(ListAPIView):
-    serializer_class = ProfileSerializer
+    serializer_class = CustomerProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = CustomerProfile.objects.all()
