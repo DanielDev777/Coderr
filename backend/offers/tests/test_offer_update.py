@@ -96,7 +96,6 @@ class OfferUpdateTests(APITestCase):
         data = {
             'details': [
                 {
-                    'id': self.basic_detail.id,
                     'price': '75.00',
                     'offer_type': 'basic'
                 }
@@ -143,7 +142,6 @@ class OfferUpdateTests(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_owner_upload_image(self):
-        # Create a simple 1x1 pixel red PNG image
         image = Image.new('RGB', (1, 1), color='red')
         image_io = io.BytesIO()
         image.save(image_io, format='PNG')
@@ -167,3 +165,66 @@ class OfferUpdateTests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.offer.refresh_from_db()
         self.assertIsNotNone(self.offer.image)
+
+    def test_owner_update_multiple_details_by_offer_type(self):
+        """Test updating multiple details using offer_type to identify them"""
+        data = {
+            'details': [
+                {
+                    'title': 'Updated Basic',
+                    'price': '80.00',
+                    'revisions': 3,
+                    'offer_type': 'basic'
+                },
+                {
+                    'title': 'Updated Premium',
+                    'delivery_time_in_days': 10,
+                    'offer_type': 'premium'
+                }
+            ]
+        }
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.owner_token.key}')
+        
+        response = self.client.patch(
+            f'/api/offers/{self.offer.id}/',
+            data,
+            format='json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        basic_detail = OfferDetail.objects.get(offer=self.offer, offer_type='basic')
+        self.assertEqual(basic_detail.title, 'Updated Basic')
+        self.assertEqual(basic_detail.price, Decimal('80.00'))
+        self.assertEqual(basic_detail.revisions, 3)
+        
+        premium_detail = OfferDetail.objects.get(offer=self.offer, offer_type='premium')
+        self.assertEqual(premium_detail.title, 'Updated Premium')
+        self.assertEqual(premium_detail.delivery_time_in_days, 10)
+        
+        standard_detail = OfferDetail.objects.get(offer=self.offer, offer_type='standard')
+        self.assertEqual(standard_detail.title, 'Standard')
+
+    def test_update_detail_without_offer_type_ignored(self):
+        """Test that details without offer_type are ignored"""
+        data = {
+            'details': [
+                {
+                    'title': 'Should Be Ignored',
+                    'price': '999.00'
+                }
+            ]
+        }
+        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.owner_token.key}')
+        
+        response = self.client.patch(
+            f'/api/offers/{self.offer.id}/',
+            data,
+            format='json'
+        )
+        
+        self.assertEqual(response.status_code, 200)
+        
+        self.basic_detail.refresh_from_db()
+        self.assertEqual(self.basic_detail.title, 'Basic')
+        self.assertEqual(self.basic_detail.price, Decimal('50.00'))

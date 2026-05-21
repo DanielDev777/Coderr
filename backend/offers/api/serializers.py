@@ -50,9 +50,7 @@ class OfferDetailSerializer(serializers.ModelSerializer):
             'features',
             'offer_type'
         ]
-        extra_kwargs = {
-            'id': {'read_only': False},
-        }
+        read_only_fields = ['id']
 
 
 class OfferCreateSerializer(serializers.ModelSerializer):
@@ -115,17 +113,16 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
 
         if details_data is not None:
             for detail_data in details_data:
-                detail_id = detail_data.get('id')
+                offer_type = detail_data.get('offer_type')
 
-                if detail_id:
+                if offer_type:
                     try:
                         detail = OfferDetail.objects.get(
-                            id=detail_id,
+                            offer_type=offer_type,
                             offer=instance
                         )
                         for attr, value in detail_data.items():
-                            if attr != 'id':
-                                setattr(detail, attr, value)
+                            setattr(detail, attr, value)
                         detail.save()
                     except OfferDetail.DoesNotExist:
                         pass

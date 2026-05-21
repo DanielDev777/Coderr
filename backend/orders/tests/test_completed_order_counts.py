@@ -11,14 +11,12 @@ class CompletedOrderCountTests(APITestCase):
 
     def setUp(self):
         """Create test users and orders (same as OrderCountTests)"""
-        # Business user
         self.business_user = User.objects.create_user(
             username='business1',
             password='pass123'
         )
         BusinessProfile.objects.create(user=self.business_user)
 
-        # Customer user
         self.customer_user = User.objects.create_user(
             username='customer1',
             password='pass456'
@@ -26,7 +24,6 @@ class CompletedOrderCountTests(APITestCase):
         CustomerProfile.objects.create(user=self.customer_user)
         self.customer_token = Token.objects.create(user=self.customer_user)
 
-        # Create offer
         self.offer = Offer.objects.create(
             user=self.business_user,
             title='Logo Design',
@@ -42,7 +39,6 @@ class CompletedOrderCountTests(APITestCase):
             offer_type='basic'
         )
 
-        # Create orders: 2 in_progress, 3 completed, 1 cancelled
         for _ in range(2):
             Order.objects.create(
                 customer_user=self.customer_user,
