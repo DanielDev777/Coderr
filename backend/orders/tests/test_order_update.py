@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from decimal import Decimal
 from users.models import BusinessProfile, CustomerProfile
 from offers.models import Offer, OfferDetail
 from orders.models import Order
@@ -91,7 +92,7 @@ class OrderUpdateTests(APITestCase):
         self.assertEqual(self.order.status, 'in_progress')
     
     def test_non_related_business_user_cannot_update(self):
-        """Different business user should not be able to update"""
+        """Different business user should get 404 (order filtered from queryset)"""
         self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.biz2_token.key}')
         data = {'status': 'completed'}
         
@@ -101,7 +102,7 @@ class OrderUpdateTests(APITestCase):
             format='json'
         )
         
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
         
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, 'in_progress')
@@ -151,4 +152,4 @@ class OrderUpdateTests(APITestCase):
         
         self.order.refresh_from_db()
         self.assertEqual(self.order.status, 'completed')
-        self.assertEqual(self.order.price, original_price)
+        self.assertEqual(self.order.price, Decimal('50.00'))
