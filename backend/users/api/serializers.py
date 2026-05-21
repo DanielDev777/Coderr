@@ -15,15 +15,23 @@ class RegistrationSerializer(serializers.ModelSerializer):
     )
     token = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(source='id', read_only=True)
+    repeated_password = serializers.CharField(write_only=True, required=True)
     
     class Meta:
         model = User
-        fields = ['user_id', 'username', 'email', 'password', 'type', 'token']
+        fields = ['user_id', 'username', 'email', 'password', 'repeated_password', 'type', 'token']
         extra_kwargs = {
             'password': {'write_only': True, 'required': True},
             'username': {'required': True},
             'email': {'required': False}
         }
+
+    def validate(self, data):
+        if data['password'] != data['repeated_password']:
+            raise serializers.ValidationError({
+                'repeated_password': "Passwords do not match."
+            })
+        return data
     
     def create(self, validated_data):
         """Create user, profile, and token"""
