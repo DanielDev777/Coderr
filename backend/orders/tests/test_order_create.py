@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from users.models import BusinessProfile, CustomerProfile
 from offers.models import Offer, OfferDetail
 from orders.models import Order
+from decimal import Decimal
 
 
 class OrderCreateTests(APITestCase):
@@ -101,7 +102,7 @@ class OrderCreateTests(APITestCase):
         self.assertEqual(order.title, self.detail.title)
         self.assertEqual(order.revisions, self.detail.revisions)
         self.assertEqual(order.delivery_time_in_days, self.detail.delivery_time_in_days)
-        self.assertEqual(order.price, self.detail.price)
+        self.assertEqual(order.price, Decimal('999.99'))
         self.assertEqual(order.features, self.detail.features)
         self.assertEqual(order.offer_type, self.detail.offer_type)
         
