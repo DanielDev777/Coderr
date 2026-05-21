@@ -9,7 +9,7 @@ class OfferFilter(django_filters.FilterSet):
     max_delivery_time = django_filters.NumberFilter(method='filter_by_max_delivery')
     
     def filter_by_min_price(self, queryset, name, value):
-        """Filter offers by minimum price across all tiers.""
+        """Filter offers by minimum price across all tiers."""
         queryset = queryset.annotate(
             minimum_price=Min('details__price')
         )
