@@ -12,6 +12,6 @@ class ReviewListView(ListCreateAPIView):
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, OrderingFilter]
-    filterset_fields = ['business_user', 'reviewer']
+    filterset_fields = ['business_user_id', 'reviewer_id']
     ordering_fields = ['created_at', 'updated_at', 'rating']
     ordering = ['-updated_at']
