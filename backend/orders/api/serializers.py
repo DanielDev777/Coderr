@@ -50,3 +50,13 @@ class OrderCreateSerializer(serializers.Serializer):
     
     def to_representation(self, instance):
         return OrderSerializer(instance).data
+    
+class OrderUpdateSerializer(serializers.ModelSerializer):
+    """Serializer for updating order status"""
+
+    class Meta:
+        model = Order
+        fields = ['status']
+
+    def to_representation(self, instance):
+        return OrderSerializer(instance).data
