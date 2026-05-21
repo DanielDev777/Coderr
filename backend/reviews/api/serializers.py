@@ -75,3 +75,26 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         """Return full review representation after creation"""
         return ReviewSerializer(instance).data
+    
+class ReviewUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating reviews.
+    
+    Only allows updating rating and description
+    """
+    
+    class Meta:
+        model = Review
+        fields = ['rating', 'description']
+    
+    def validate_description(self, value):
+        """Validate description is not empty if provided"""
+        if value is not None and (not value or not value.strip()):
+            raise serializers.ValidationError(
+                "Description cannot be empty."
+            )
+        return value
+    
+    def to_representation(self, instance):
+        """Return full review representation after update"""
+        return ReviewSerializer(instance).data
