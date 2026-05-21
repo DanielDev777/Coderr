@@ -90,6 +90,25 @@ class OfferListTests(APITestCase):
         self.assertEqual(results[0]['user'], self.user1.id)
         self.assertEqual(results[0]['title'], 'User1 Offer')
 
+    def test_filter_by_min_price(self):
+        """Test filtering by min_price"""
+        self.create_offer_with_details(
+            self.user1, 'Cheap Offer',
+            basic_price=50, standard_price=100, premium_price=150
+        )
+        self.create_offer_with_details(
+            self.user1, 'Expensive Offer',
+            basic_price=500, standard_price=800, premium_price=1200
+        )
+        
+        response = self.client.get('/api/offers/?min_price=200')
+        
+        self.assertEqual(response.status_code, 200)
+        results = response.data['results']
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], 'Expensive Offer')
+        self.assertGreaterEqual(results[0]['min_price'], 200)
+
     def test_filter_by_max_delivery_time(self):
         """Test filtering by max_delivery_time"""
         self.create_offer_with_details(

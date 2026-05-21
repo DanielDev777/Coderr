@@ -4,7 +4,14 @@ from django.db.models import Min
 
 class OfferFilter(django_filters.FilterSet):
     creator_id = django_filters.NumberFilter(field_name='user', lookup_expr='exact')
+    min_price = django_filters.NumberFilter(method='filter_by_min_price')
     max_delivery_time = django_filters.NumberFilter(method='filter_by_max_delivery')
+    
+    def filter_by_min_price(self, queryset, name, value):
+        queryset = queryset.annotate(
+            minimum_price=Min('details__price')
+        )
+        return queryset.filter(minimum_price__gte=value)
     
     def filter_by_max_delivery(self, queryset, name, value):
         queryset = queryset.annotate(
@@ -15,4 +22,4 @@ class OfferFilter(django_filters.FilterSet):
     
     class Meta:
         model = Offer
-        fields = ['creator_id', 'max_delivery_time']
+        fields = ['creator_id', 'min_price', 'max_delivery_time']
