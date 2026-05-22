@@ -11,6 +11,7 @@ class RegistrationTests(APITestCase):
             'username': 'bizuser',
             'email': 'biz@test.com',
             'password': 'pass123',
+            'repeated_password': 'pass123',
             'type': 'business'
         }
         response = self.client.post('/api/registration/', data)
@@ -32,6 +33,7 @@ class RegistrationTests(APITestCase):
             'username': 'custuser',
             'email': 'cust@test.com',
             'password': 'pass456',
+            'repeated_password': 'pass456',
             'type': 'customer'
         }
         response = self.client.post('/api/registration/', data)
@@ -51,6 +53,7 @@ class RegistrationTests(APITestCase):
             'username': 'existing',
             'email': 'new@test.com',
             'password': 'pass123',
+            'repeated_password': 'pass123',
             'type': 'business'
         }
         response = self.client.post('/api/registration/', data)

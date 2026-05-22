@@ -62,7 +62,7 @@ class ReviewListTests(APITestCase):
         response = self.client.get('/api/reviews/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 3)
+        self.assertEqual(len(response.data), 3)
     
     def test_filter_by_business_user(self):
         """Should return only reviews for specific business user"""
@@ -71,9 +71,9 @@ class ReviewListTests(APITestCase):
         response = self.client.get(f'/api/reviews/?business_user_id={self.business_user1.id}')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(len(response.data), 2)
         
-        review_ids = [review['id'] for review in response.data['results']]
+        review_ids = [review['id'] for review in response.data]
         self.assertIn(self.review1.id, review_ids)
         self.assertIn(self.review2.id, review_ids)
         self.assertNotIn(self.review3.id, review_ids)
@@ -85,9 +85,9 @@ class ReviewListTests(APITestCase):
         response = self.client.get(f'/api/reviews/?reviewer_id={self.customer_user1.id}')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 2)
+        self.assertEqual(len(response.data), 2)
         
-        review_ids = [review['id'] for review in response.data['results']]
+        review_ids = [review['id'] for review in response.data]
         self.assertIn(self.review1.id, review_ids)
         self.assertNotIn(self.review2.id, review_ids)
         self.assertIn(self.review3.id, review_ids)
@@ -99,7 +99,7 @@ class ReviewListTests(APITestCase):
         response = self.client.get('/api/reviews/?ordering=-rating')
         
         self.assertEqual(response.status_code, 200)
-        ratings = [review['rating'] for review in response.data['results']]
+        ratings = [review['rating'] for review in response.data]
         self.assertEqual(ratings, [5, 4, 3])
     
     def test_sort_by_rating_ascending(self):
@@ -109,7 +109,7 @@ class ReviewListTests(APITestCase):
         response = self.client.get('/api/reviews/?ordering=rating')
         
         self.assertEqual(response.status_code, 200)
-        ratings = [review['rating'] for review in response.data['results']]
+        ratings = [review['rating'] for review in response.data]
         self.assertEqual(ratings, [3, 4, 5])
     
     def test_unauthenticated_user_cannot_list_reviews(self):

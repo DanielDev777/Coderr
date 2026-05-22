@@ -66,7 +66,7 @@ class ProfileListsTests(APITestCase):
 
         response = self.client.get('/api/profiles/business/')
 
-        results = response.data['results']
+        results = response.data
         self.assertEqual(len(results), 2)
         
         usernames = [profile['username'] for profile in results]
@@ -85,7 +85,7 @@ class ProfileListsTests(APITestCase):
         response = self.client.get(f'/api/profiles/business/')
 
         empty_profile = None
-        for profile in response.data['results']:
+        for profile in response.data:
             if profile['username'] == 'emptyuser':
                 empty_profile = profile
                 break
@@ -106,7 +106,7 @@ class ProfileListsTests(APITestCase):
         
         self.assertEqual(response.status_code, 200)
         
-        for profile in response.data['results']:
+        for profile in response.data:
             self.assertNotIn('email', profile)
             self.assertNotIn('created_at', profile)
             self.assertNotIn('uploaded_at', profile)
@@ -130,9 +130,9 @@ class ProfileListsTests(APITestCase):
         response = self.client.get('/api/profiles/business/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(len(response.data), 4)
         
-        results = response.data['results']
+        results = response.data
         usernames = [profile['username'] for profile in results]
         self.assertIn('bizuser', usernames)
         self.assertIn('business0', usernames)
@@ -162,7 +162,7 @@ class ProfileListsTests(APITestCase):
 
         response = self.client.get('/api/profiles/customer/')
 
-        results = response.data['results']
+        results = response.data
         self.assertEqual(len(results), 2)
         
         usernames = [profile['username'] for profile in results]
@@ -181,7 +181,7 @@ class ProfileListsTests(APITestCase):
         response = self.client.get(f'/api/profiles/customer/')
 
         empty_profile = None
-        for profile in response.data['results']:
+        for profile in response.data:
             if profile['username'] == 'emptycust':
                 empty_profile = profile
                 break
@@ -198,7 +198,7 @@ class ProfileListsTests(APITestCase):
         
         self.assertEqual(response.status_code, 200)
         
-        for profile in response.data['results']:
+        for profile in response.data:
             self.assertIn('uploaded_at', profile)
             self.assertNotIn('created_at', profile)
 
@@ -209,7 +209,7 @@ class ProfileListsTests(APITestCase):
         
         self.assertEqual(response.status_code, 200)
         
-        for profile in response.data['results']:
+        for profile in response.data:
             self.assertNotIn('location', profile)
             self.assertNotIn('tel', profile)
             self.assertNotIn('description', profile)
@@ -235,9 +235,9 @@ class ProfileListsTests(APITestCase):
         response = self.client.get('/api/profiles/customer/')
         
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 4)
+        self.assertEqual(len(response.data), 4)
         
-        results = response.data['results']
+        results = response.data
         usernames = [profile['username'] for profile in results]
         self.assertIn('custuser', usernames)
         self.assertIn('customer0', usernames)
