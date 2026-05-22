@@ -1,13 +1,12 @@
+from django.db.models import Avg
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import status
+from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.filters import OrderingFilter
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from django.db.models import Avg
+from rest_framework.views import APIView
 
-from users.models import BusinessProfile
 from offers.models import Offer
 from reviews.models import Review
 from reviews.api.serializers import (
@@ -16,6 +15,7 @@ from reviews.api.serializers import (
     ReviewUpdateSerializer
 )
 from reviews.permissions import IsCustomerUser, IsReviewOwner
+from users.models import BusinessProfile
 
 class ReviewListView(ListCreateAPIView):
     """API endpoint for listing and creating reviews."""

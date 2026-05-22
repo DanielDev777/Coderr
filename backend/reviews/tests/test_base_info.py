@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
-from users.models import BusinessProfile, CustomerProfile
-from reviews.models import Review
+from rest_framework.test import APITestCase
+
 from offers.models import Offer
+from reviews.models import Review
+from users.models import BusinessProfile, CustomerProfile
 
 
 class BaseInfoTests(APITestCase):

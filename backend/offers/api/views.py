@@ -1,12 +1,12 @@
+from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Min
 from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
-from django_filters.rest_framework import DjangoFilterBackend
-from django.db.models import Min
 
 from offers.filters import OfferFilter
-from offers.permissions import IsBusinessUser, IsOfferOwner
 from offers.models import Offer, OfferDetail
+from offers.permissions import IsBusinessUser, IsOfferOwner
 from .serializers import OfferDetailSerializer, OfferListSerializer, OfferCreateSerializer, OfferUpdateSerializer
 
 

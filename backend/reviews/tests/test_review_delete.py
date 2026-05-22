@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from users.models import BusinessProfile, CustomerProfile
+from rest_framework.test import APITestCase
+
 from reviews.models import Review
+from users.models import BusinessProfile, CustomerProfile
 
 
 class ReviewDeleteTests(APITestCase):

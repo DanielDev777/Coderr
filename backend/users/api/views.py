@@ -1,12 +1,13 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
 from django.contrib.auth.models import User
-from django.shortcuts import get_object_or_404
 from django.http import Http404
+from django.shortcuts import get_object_or_404
+from rest_framework import status
+from rest_framework.generics import ListAPIView, RetrieveUpdateAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from .permissions import IsOwnerOrReadOnly
 from .serializers import (
     RegistrationSerializer, 
     LoginSerializer, 
@@ -14,7 +15,6 @@ from .serializers import (
     BusinessProfileListSerializer,
     CustomerProfileListSerializer
 )
-from .permissions import IsOwnerOrReadOnly
 from users.models import BusinessProfile, CustomerProfile
 
 

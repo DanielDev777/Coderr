@@ -1,9 +1,10 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from users.models import BusinessProfile, CustomerProfile
+from rest_framework.test import APITestCase
+
 from offers.models import Offer, OfferDetail
 from orders.models import Order
+from users.models import BusinessProfile, CustomerProfile
 
 class OrderListTests(APITestCase):
     """Test suite for GET /api/orders/ endpoint"""

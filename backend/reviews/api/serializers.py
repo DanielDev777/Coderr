@@ -1,6 +1,7 @@
-from rest_framework import serializers
-from reviews.models import Review
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
+from reviews.models import Review
 
 
 class ReviewSerializer(serializers.ModelSerializer):

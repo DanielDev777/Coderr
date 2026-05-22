@@ -1,9 +1,10 @@
-from rest_framework.test import APITestCase
+from decimal import Decimal
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase
+import time
+
 from offers.models import Offer, OfferDetail
 from users.models import BusinessProfile
-from decimal import Decimal
-import time
 
 
 class OfferListTests(APITestCase):

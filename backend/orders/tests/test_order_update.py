@@ -1,10 +1,11 @@
-from rest_framework.test import APITestCase
+from decimal import Decimal
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from decimal import Decimal
-from users.models import BusinessProfile, CustomerProfile
+from rest_framework.test import APITestCase
+
 from offers.models import Offer, OfferDetail
 from orders.models import Order
+from users.models import BusinessProfile, CustomerProfile
 
 class OrderUpdateTests(APITestCase):
     """Test suite for PATCH /api/orders/{id}/ endpoint"""

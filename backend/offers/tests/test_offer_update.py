@@ -1,12 +1,13 @@
-from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
-from users.models import BusinessProfile
-from offers.models import Offer, OfferDetail
 from decimal import Decimal
+from django.contrib.auth.models import User
 from django.core.files.uploadedfile import SimpleUploadedFile
-from PIL import Image
 import io
+from PIL import Image
+from rest_framework.test import APITestCase
+from rest_framework.authtoken.models import Token
+
+from offers.models import Offer, OfferDetail
+from users.models import BusinessProfile
 
 
 class OfferUpdateTests(APITestCase):

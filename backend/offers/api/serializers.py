@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from offers.models import Offer, OfferDetail
 
 

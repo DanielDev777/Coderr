@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
-from users.models import BusinessProfile, CustomerProfile
+
 from offers.models import Offer, OfferDetail
+from users.models import BusinessProfile, CustomerProfile
 
 
 class OfferCreateTests(APITestCase):
@@ -58,7 +59,7 @@ class OfferCreateTests(APITestCase):
     def test_business_user_can_create_offer(self):
         self.client.credentials(
             HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
-        
+
         data = self.get_valid_offer_data()
 
         response = self.client.post('/api/offers/', data, format='json')
@@ -75,7 +76,8 @@ class OfferCreateTests(APITestCase):
     def test_customer_user_cannot_create_offer(self):
         """Test that customer users are forbidden from creating offers"""
 
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.customer_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.customer_token.key}')
 
         data = self.get_valid_offer_data()
 
@@ -94,7 +96,8 @@ class OfferCreateTests(APITestCase):
 
     def test_less_than_three_details_returns_400(self):
         """Test that offers must have exactly 3 details"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
         data = self.get_valid_offer_data()
         data['details'] = data['details'][:2]
 
@@ -106,7 +109,8 @@ class OfferCreateTests(APITestCase):
 
     def test_more_than_three_details_returns_400(self):
         """Test that offers cannot have more than 3 details"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
 
         data = self.get_valid_offer_data()
         data['details'].append({
@@ -125,7 +129,8 @@ class OfferCreateTests(APITestCase):
 
     def test_duplicate_offer_type_returns_400(self):
         """Test that all 3 details must have different offer_types"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
 
         data = self.get_valid_offer_data()
         data['details'][1]['offer_type'] = 'basic'
@@ -138,7 +143,8 @@ class OfferCreateTests(APITestCase):
 
     def test_missing_title_returns_400(self):
         """Test that title field is required"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
 
         data = self.get_valid_offer_data()
         del data['title']
@@ -150,7 +156,8 @@ class OfferCreateTests(APITestCase):
 
     def test_creator_is_set_from_request_user(self):
         """Test that creator is automatically set from authenticated user"""
-        self.client.credentials(HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f'Token {self.business_token.key}')
 
         data = self.get_valid_offer_data()
         data['user'] = 999
@@ -158,7 +165,7 @@ class OfferCreateTests(APITestCase):
         response = self.client.post('/api/offers/', data, format='json')
 
         self.assertEqual(response.status_code, 201)
-    
+
         offer = Offer.objects.first()
         self.assertEqual(offer.user, self.business_user)
         self.assertNotEqual(offer.user.id, 999)

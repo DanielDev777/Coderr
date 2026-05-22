@@ -1,4 +1,5 @@
 from django.urls import path
+
 from .views import OrderListView, OrderDetailView, OrderCountView, CompletedOrderCountView
 
 urlpatterns = [

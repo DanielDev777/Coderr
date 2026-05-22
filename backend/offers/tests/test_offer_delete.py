@@ -1,8 +1,9 @@
-from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
+from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
-from users.models import BusinessProfile
+
 from offers.models import Offer, OfferDetail
+from users.models import BusinessProfile
 
 class OfferDeleteTests(APITestCase):
     """Test suite for DELETE /api/offers/<id>/ endpoint"""
