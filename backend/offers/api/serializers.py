@@ -114,6 +114,15 @@ class OfferUpdateSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'image', 'description', 'details']
         read_only_fields = ['id']
 
+    def validate_details(self, value):
+        """Validate that each detail has offer_type when updating."""
+        for detail in value:
+            if 'offer_type' not in detail:
+                raise serializers.ValidationError(
+                    "Each detail must include 'offer_type' field"
+                )
+        return value
+
     def update(self, instance, validated_data):
         """Update offer and its details by offer_type."""
         details_data = validated_data.pop('details', None)
