@@ -3,7 +3,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.filters import OrderingFilter
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -60,7 +60,7 @@ class ReviewDetailView(RetrieveUpdateDestroyAPIView):
     
 class BaseInfoView(APIView):
     """API endpoint for platform-wide statistics."""
-    permission_classes = []
+    permission_classes = [AllowAny]
     
     def get(self, request):
         """Return platform-wide statistics"""

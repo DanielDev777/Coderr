@@ -84,9 +84,11 @@ class BusinessProfileListView(ListAPIView):
     serializer_class = BusinessProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = BusinessProfile.objects.all()
+    pagination_class = None
 
 class CustomerProfileListView(ListAPIView):
     """API endpoint for listing customer profiles."""
     serializer_class = CustomerProfileListSerializer
     permission_classes = [IsAuthenticated]
     queryset = CustomerProfile.objects.all()
+    pagination_class = None
