@@ -19,6 +19,7 @@ from orders.permissions import IsCustomerUser, IsOrderBusinessUser
 class OrderListView(ListCreateAPIView):
     """API endpoint for listing and creating orders."""
     permission_classes = [IsAuthenticated]
+    pagination_class = None
 
     def get_serializer_class(self):
         if self.request.method == 'POST':

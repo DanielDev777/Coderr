@@ -26,6 +26,7 @@ class ReviewListView(ListCreateAPIView):
     filterset_fields = ['business_user_id', 'reviewer_id']
     ordering_fields = ['updated_at', 'rating']
     ordering = ['-updated_at']
+    pagination_class = None
 
     def get_serializer_class(self):
         """Use different serializers for different actions"""
