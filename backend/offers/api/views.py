@@ -4,6 +4,7 @@ from rest_framework import filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, RetrieveUpdateDestroyAPIView
 
+from core.pagination import CustomPageNumberPagination
 from offers.filters import OfferFilter
 from offers.models import Offer, OfferDetail
 from offers.permissions import IsBusinessUser, IsOfferOwner
@@ -13,6 +14,7 @@ from .serializers import OfferDetailSerializer, OfferListSerializer, OfferCreate
 class OfferListView(ListCreateAPIView):
     """API endpoint for listing and creating offers."""
     permission_classes = [AllowAny]
+    pagination_class = CustomPageNumberPagination
     filter_backends = [DjangoFilterBackend,
                        filters.SearchFilter, filters.OrderingFilter]
     filterset_class = OfferFilter
