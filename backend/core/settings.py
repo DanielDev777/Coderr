@@ -37,6 +37,7 @@ ALLOWED_HOSTS = [
     '178.105.253.67',
     'localhost',
     '127.0.0.1',
+    'coderr.dev-kersten.de',
 ]
 
 
@@ -151,7 +152,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
-    "http://178.105.253.67",  # Production server
+    "http://178.105.253.67",
+    "http://coderr.dev-kersten.de",
+    "https://coderr.dev-kersten.de",
 ]
 
 # Django REST Framework Configuration
